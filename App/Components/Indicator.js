@@ -1,6 +1,6 @@
 import {View, ActivityIndicator} from 'react-native';
 import React from 'react';
-
+import Colors from '../common/Colors';
 const Indicator = () => {
   return (
     <View
@@ -14,7 +14,7 @@ const Indicator = () => {
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.7)',
       }}>
-      <ActivityIndicator size="large" color="#bad" />
+      <ActivityIndicator size="large" color={Colors.primary} />
     </View>
   );
 };

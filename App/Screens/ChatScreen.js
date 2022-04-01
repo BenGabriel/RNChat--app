@@ -12,13 +12,14 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import Indicator from '../Components/Indicator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {database} from '../Firebase/firebaseConfig';
-import AppHeader from '../Components/AppHeader';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Font from 'react-native-vector-icons/FontAwesome5';
 import {ReceiveMessage, SendMessage} from '../Firebase/Message';
 import {child, onValue, ref} from 'firebase/database';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import ImgToBase64 from 'react-native-image-base64';
 import dayjs from 'dayjs';
+import Colors from '../common/Colors';
 
 const {width, height} = Dimensions.get('window');
 
@@ -75,7 +76,7 @@ const ChatScreen = ({
       SendMessage(currentUid, guestUid, message, '')
         .then(() => {
           setMessage('');
-          item.getAllUsers()
+          item.getAllUsers();
         })
         .catch(err => console.log(err));
 
@@ -114,11 +115,35 @@ const ChatScreen = ({
     <View
       style={{
         flex: 1,
-        backgroundColor: '#000',
-        // justifyContent: 'center',
-        // alignItems: 'center',
+        backgroundColor: '#fbfcff',
       }}>
-      <AppHeader title={item.userName} onPress={() => logOut()} />
+      <View style={styles.top}>
+        <TouchableOpacity
+          style={{marginLeft: 10}}
+          onPress={() => navigation.goBack()}>
+          <Font name="chevron-left" size={18}  color='#555'/>
+        </TouchableOpacity>
+        <View
+          style={{flexDirection: 'row', alignItems: 'center', marginLeft: 30}}>
+          <Image
+            source={{uri: item.image}}
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: 100,
+            }}
+          />
+          <Text
+            style={{
+              marginLeft: 10,
+              fontSize: 16,
+              fontWeight: 'bold',
+              color: '#000',
+            }}>
+            {item.userName}
+          </Text>
+        </View>
+      </View>
       <FlatList
         inverted
         style={{marginBottom: 60, marginHorizontal: 10}}
@@ -128,27 +153,31 @@ const ChatScreen = ({
           <View
             style={{
               marginVertical: 4,
+              marginHorizontal: 4,
               maxWidth: width / 1.5 + 20,
               alignSelf: currentUid === item.sendBy ? 'flex-end' : 'flex-start',
             }}>
             <View
               style={{
                 borderRadius: 10,
-                backgroundColor: currentUid === item.sendBy ? '#fff' : '#bad',
+                backgroundColor:
+                  currentUid === item.sendBy ? Colors.primary : '#fff',
                 overflow: 'hidden',
+                elevation: 2
               }}>
               {item.image === '' ? (
                 <Text
                   style={{
-                    paddingVertical: 5,
+                    paddingVertical: 7,
                     paddingHorizontal: 10,
-                    fontSize: 15,
+                    fontSize: 14,
                     fontWeight: 'bold',
+                    color: currentUid === item.sendBy ? '#fff' : '#000',
                   }}>
                   {item.message} {'  '}{' '}
                   <Text
                     style={{
-                      fontSize: 12,
+                      fontSize: 10,
                     }}>
                     {item.time}
                   </Text>
@@ -166,10 +195,10 @@ const ChatScreen = ({
                   <Text
                     style={{
                       fontSize: 12,
-                      position:'absolute',
+                      position: 'absolute',
                       bottom: 5,
                       right: 5,
-                      color:'#fff'
+                      color: '#fff',
                     }}>
                     {item.time}
                   </Text>
@@ -187,32 +216,40 @@ const ChatScreen = ({
           height: 50,
           flexDirection: 'row',
           alignItems: 'center',
-          justifyContent: 'space-around',
+          justifyContent: 'space-evenly',
         }}>
-        <TouchableOpacity
-          style={{...styles.icons, marginRight: 5}}
-          onPress={() => openGallery()}>
-          <Icon name="camera" size={30} color="#fff" />
-        </TouchableOpacity>
-        <View style={{width: '70%', justifyContent: 'center'}}>
+        <View style={styles.inputContainer}>
           <TextInput
             value={message}
             placeholder="Enter Message"
             placeholderTextColor="#000"
             style={{
               height: 40,
-              width: '100%',
-              borderRadius: 20,
-              backgroundColor: '#ccc',
+              width: '85%',
               paddingLeft: 10,
+              color:'#000'
             }}
             onChangeText={text => setMessage(text)}
           />
+
+          <TouchableOpacity
+            style={{...styles.icons}}
+            onPress={() => openGallery()}>
+            <Font name="camera" size={20} color="#000" />
+          </TouchableOpacity>
         </View>
         <TouchableOpacity
-          style={{...styles.icons, marginLeft: 5}}
+          style={{
+            ...styles.icons,
+            marginLeft: 5,
+            backgroundColor: Colors.primary,
+            width: 38,
+            height: 38,
+            borderRadius: 10,
+            elevation: 3
+          }}
           onPress={() => sendMessage()}>
-          <Icon name="send" size={30} color="#fff" />
+          <Icon name="send" size={18} color="#fff" />
         </TouchableOpacity>
       </View>
     </View>
@@ -224,6 +261,21 @@ export default ChatScreen;
 const styles = StyleSheet.create({
   icons: {
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  top: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    width: '100%',
+    backgroundColor: '#fff',
+  },
+  inputContainer: {
+    width: '80%',
+    flexDirection: 'row',
+    backgroundColor: Colors.white,
+    elevation: 3,
+    borderRadius: 10,
     alignItems: 'center',
   },
 });

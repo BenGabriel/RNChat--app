@@ -2,11 +2,12 @@ import {StyleSheet, Text, View, Image} from 'react-native';
 import React from 'react';
 import TextInputComponent from '../Components/TextInputComponent';
 import ButtonComponent from '../Components/ButtonComponent';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import {Login} from '../Firebase/Login';
 import Indicator from '../Components/Indicator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {auth} from '../Firebase/firebaseConfig';
+import Colors from '../common/Colors';
 
 const LoginScreen = props => {
   const [details, setDetails] = React.useState({
@@ -20,7 +21,7 @@ const LoginScreen = props => {
     setLoader(true);
     const uid = await AsyncStorage.getItem('UID');
     if (uid) {
-      props.navigation.navigate('Dashboard');
+      props.navigation.replace('Dashboard');
       setLoader(false);
     }
     setLoader(false);
@@ -40,7 +41,9 @@ const LoginScreen = props => {
     setLoader(true);
     Login(details.email, details.password)
       .then(async res => {
+        console.log(res)
         const uid = auth.currentUser.uid;
+        console.log(uid);
         await AsyncStorage.setItem('UID', uid);
         console.log(res);
         setLoader(false);
@@ -53,41 +56,92 @@ const LoginScreen = props => {
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: '#000',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-      <Image
-        source={require('../assets/cherry.png')}
-        style={{width: 100, height: 100, borderRadius: 30, marginBottom: 20}}
-      />
-      <TextInputComponent
-        placeholder="Enter Email"
-        onChangeText={text => setDetails({...details, email: text})}
-      />
-      <TextInputComponent
-        placeholder="Enter Password"
-        onChangeText={text => setDetails({...details, password: text})}
-      />
-      <ButtonComponent title="Login" onPress={() => logintoFirebase()} />
-      <TouchableOpacity onPress={() => props.navigation.navigate('SignUp')}>
-        <Text
-          style={{
-            color: '#fff',
-            fontSize: 16,
-            fontWeight: 'bold',
-          }}>
-          New user? Click Here
+    <>
+      <ScrollView
+        style={{
+          flex: 1,
+          backgroundColor: Colors.appWhite,
+        }}
+        showsVerticalScrollIndicator={false}>
+        <Text style={styles.text}>
+          BEN <Text style={{color: '#000'}}>DESIGNER</Text>
         </Text>
-      </TouchableOpacity>
+        <View style={styles.vertical} />
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 110,
+            width: '100%',
+            padding: 10,
+          }}>
+          <TextInputComponent
+            placeholder="Email"
+            onChangeText={text => setDetails({...details, email: text})}
+          />
+          <TextInputComponent
+            placeholder="Password"
+            onChangeText={text => setDetails({...details, password: text})}
+          />
+          <Text
+            style={{
+              width: '85%',
+              textAlign: 'right',
+              fontSize: 12,
+            }}>
+            Forgot Password?
+          </Text>
+          <ButtonComponent
+            title="Login"
+            onPress={() => logintoFirebase()}
+            style={{
+              marginVertical: 40,
+              marginBottom: 140,
+            }}
+          />
+          <TouchableOpacity
+            onPress={() => props.navigation.navigate('SignUp')}
+            style={{
+              alignItems: 'center',
+            }}>
+            <Text
+              style={{
+                color: '#a2a5b6',
+                fontSize: 13,
+                fontWeight: 'bold',
+              }}>
+              Don't have an account?{' '}
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: '#707787',
+                }}>
+                Signup
+              </Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
       {loader ? <Indicator /> : null}
-    </View>
+    </>
   );
 };
 
 export default LoginScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  text: {
+    textAlign: 'center',
+    color: Colors.primary,
+    fontSize: 30,
+    fontWeight: 'bold',
+    marginTop: 60,
+  },
+  vertical: {
+    borderWidth: 1.3,
+    width: 45,
+    borderColor: Colors.primary,
+    alignSelf: 'center',
+    marginTop: 5,
+  },
+});

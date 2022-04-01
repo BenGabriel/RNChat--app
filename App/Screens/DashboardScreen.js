@@ -1,16 +1,17 @@
 import {StyleSheet, Text, View, FlatList, Image} from 'react-native';
 import React from 'react';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import {TextInput, TouchableOpacity} from 'react-native-gesture-handler';
 import {auth, database} from '../Firebase/firebaseConfig';
 import {child, onValue, orderByKey, query, ref} from 'firebase/database';
 import {signOut} from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Indicator from '../Components/Indicator';
-import AppHeader from '../Components/AppHeader';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import ImgToBase64 from 'react-native-image-base64';
 import {UpdateUserImage} from '../Firebase/Users';
 import {limitToLast} from 'firebase/firestore';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import Colors from '../common/Colors';
 
 const DashboardScreen = props => {
   const [allUsers, setAllUsers] = React.useState([]);
@@ -124,7 +125,7 @@ const DashboardScreen = props => {
     await signOut(auth)
       .then(async () => {
         await AsyncStorage.removeItem('UID');
-        props.navigation.replace('Login');
+        props.navigation.navigate('Login');
       })
       .catch(err => console.log(err));
   };
@@ -153,51 +154,33 @@ const DashboardScreen = props => {
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: '#000'}}>
-      <AppHeader title="Messages" onPress={() => logOut()} />
+    <View style={{flex: 1, backgroundColor: '#fbfcff'}}>
+      <Text style={styles.headerText} onPress={() => logOut()}>
+        Messages
+      </Text>
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.search}
+          placeholder="Search"
+          placeholderTextColor="#cecece"
+        />
+        <Icon name="search" size={20} color="#c0c4c7" />
+      </View>
       <FlatList
         alwaysBounceVertical={false}
         data={allUsers}
         style={{padding: 5}}
         keyExtractor={(_, index) => index.toString()}
-        ListHeaderComponent={
-          <View
-            style={{
-              height: 160,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <TouchableOpacity
-              style={{...styles.imageContainer, width: 80, height: 80}}
-              onPress={() => openGallery()}>
-              <Image
-                source={{
-                  uri:
-                    image === ''
-                      ? 'https://www.comercialmoyano.com/4706-thickbox_default/blue-italian-fashion-men-suit.jpg'
-                      : image,
-                }}
-                style={{width: '100%', height: '100%'}}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-            <Text
-              style={{
-                color: '#fff',
-                fontSize: 20,
-                fontWeight: 'bold',
-                marginTop: 20,
-              }}>
-              {loggedInUser}
-            </Text>
-          </View>
-        }
+        contentContainerStyle={{
+          padding: 10,
+          paddingLeft: 15,
+        }}
         renderItem={({item}) => (
           <TouchableOpacity
             style={{
               flexDirection: 'row',
               borderBottomWidth: 0.2,
-              borderColor: '#fff',
+              borderColor: '#c4c4c4',
               paddingVertical: 15,
             }}
             onPress={() =>
@@ -205,7 +188,11 @@ const DashboardScreen = props => {
                 item: {
                   uuid: item.uuid,
                   userName: item.userName,
-                  getAllUsers: getAllUsers
+                  getAllUsers,
+                  image:
+                    item.image === ''
+                      ? 'https://www.comercialmoyano.com/4706-thickbox_default/blue-italian-fashion-men-suit.jpg'
+                      : item.image,
                 },
               })
             }>
@@ -228,10 +215,11 @@ const DashboardScreen = props => {
                 justifyContent: 'center',
                 marginLeft: 10,
               }}>
-              <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>
+              <Text
+                style={{color: '#424b5c', fontSize: 16, fontWeight: 'bold'}}>
                 {item.userName}
               </Text>
-              <Text style={{color: '#fff', fontSize: 12, fontWeight: '600'}}>
+              <Text style={{color: '#818793', fontSize: 12, fontWeight: '600'}}>
                 {item.lastMessage}
               </Text>
             </View>
@@ -239,10 +227,10 @@ const DashboardScreen = props => {
               style={{
                 width: '20%',
                 alignItems: 'flex-start',
-                justifyContent: 'center',
+                justifyContent: 'flex-start',
                 marginRight: 20,
               }}>
-              <Text style={{color: '#fff', fontSize: 13, fontWeight: '400'}}>
+              <Text style={{color: '#c0c4c7', fontSize: 13, fontWeight: '400'}}>
                 {item.lastTime}
               </Text>
             </View>
@@ -257,6 +245,13 @@ const DashboardScreen = props => {
 export default DashboardScreen;
 
 const styles = StyleSheet.create({
+  headerText: {
+    fontSize: 23,
+    fontWeight: 'bold',
+    marginTop: 15,
+    marginHorizontal: 20,
+    color:'#333'
+  },
   imageContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -266,5 +261,22 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 0.2,
     borderColor: '#fff',
+  },
+  searchContainer: {
+    width: '85%',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignSelf: 'center',
+    marginVertical: 20,
+    alignItems: 'center',
+    borderRadius: 15,
+    height: 46,
+    backgroundColor: Colors.white,
+    elevation: 3,
+  },
+  search: {
+    width: '70%',
+    height: 45,
+    fontWeight: 'bold',
   },
 });
